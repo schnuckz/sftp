@@ -1,22 +1,27 @@
-# SFTP
+# SFTP with Fail2ban
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/atmoz/sftp/build?logo=github) ![GitHub stars](https://img.shields.io/github/stars/atmoz/sftp?logo=github) ![Docker Stars](https://img.shields.io/docker/stars/atmoz/sftp?label=stars&logo=docker) ![Docker Pulls](https://img.shields.io/docker/pulls/atmoz/sftp?label=pulls&logo=docker)
-
-![OpenSSH logo](https://raw.githubusercontent.com/atmoz/sftp/master/openssh.png "Powered by OpenSSH")
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/schnuckz/sftp/build?logo=github) ![GitHub stars](https://img.shields.io/github/stars/schnuckz/sftp?logo=github) ![Docker Stars](https://img.shields.io/docker/stars/schnuckz/sftp?label=stars&logo=docker) ![Docker Pulls](https://img.shields.io/docker/pulls/schnuckz/sftp?label=pulls&logo=docker)
 
 # Supported tags and respective `Dockerfile` links
 
-- [`debian`, `latest` (*Dockerfile*)](https://github.com/atmoz/sftp/blob/master/Dockerfile) ![Docker Image Size (debian)](https://img.shields.io/docker/image-size/atmoz/sftp/debian?label=debian&logo=debian&style=plastic)
-- [`alpine` (*Dockerfile*)](https://github.com/atmoz/sftp/blob/master/Dockerfile-alpine) ![Docker Image Size (alpine)](https://img.shields.io/docker/image-size/atmoz/sftp/alpine?label=alpine&logo=Alpine%20Linux&style=plastic)
+- [`debian`, `latest` (*Dockerfile*)](https://github.com/schnuckz/sftp/blob/master/Dockerfile) ![Docker Image Size (debian)](https://img.shields.io/docker/image-size/schnuckz/sftp/debian?label=debian&logo=debian&style=plastic)
 
 # Securely share your files
 
-Easy to use SFTP ([SSH File Transfer Protocol](https://en.wikipedia.org/wiki/SSH_File_Transfer_Protocol)) server with [OpenSSH](https://en.wikipedia.org/wiki/OpenSSH).
+Easy to use SFTP ([SSH File Transfer Protocol](https://en.wikipedia.org/wiki/SSH_File_Transfer_Protocol)) server with [OpenSSH](https://en.wikipedia.org/wiki/OpenSSH). Forked from atmoz/sftp. Code also from MarkusMcNugen/docker-sftp
+This is an automated build linked with [debian:buster](https://hub.docker.com/r/debian/buster/).
+
+# Docker Features
+* Base: debian:buster
+* Hardened default ssh config
+* Mount only one persistent Volume for all config-files
+* Fail2ban
+* Optional config volume can be mounted for custom ssh and fail2ban configuration and easily viewing fail2ban log
 
 # Usage
 
 - Define users in (1) command arguments, (2) `SFTP_USERS` environment variable
-  or (3) in file mounted as `/etc/sftp/users.conf` (syntax:
+  or (3) in file mounted as `/config/sshd/users.conf` (syntax:
   `user:pass[:e][:uid[:gid[:dir1[,dir2]...]]] ...`, see below for examples)
   - Set UID/GID manually for your users if you want them to make changes to
     your mounted volumes with permissions matching your host filesystem.
@@ -29,14 +34,14 @@ Easy to use SFTP ([SSH File Transfer Protocol](https://en.wikipedia.org/wiki/SSH
     Just remember that the users can't create new files directly under their
     own home directory, so make sure there are at least one subdirectory if you
     want them to upload files.
-  - For consistent server fingerprint, mount your own host keys (i.e. `/etc/ssh/ssh_host_*`)
+  - For consistent server fingerprint, mount your own host keys (i.e. `/config/sshd/keys/ssh_host_*`)
 
 # Examples
 
 ## Simplest docker run example
 
 ```
-docker run -p 22:22 -d atmoz/sftp foo:pass:::upload
+docker run -p 22:22 -d schnuckz/sftp foo:pass:::upload
 ```
 
 User "foo" with password "pass" can login with sftp and upload files to a folder called "upload". No mounted directories or custom UID/GID. Later you can inspect the files and use `--volumes-from` to mount them somewhere else (or see next example).
@@ -48,7 +53,7 @@ Let's mount a directory and set UID:
 ```
 docker run \
     -v <host-dir>/upload:/home/foo/upload \
-    -p 2222:22 -d atmoz/sftp \
+    -p 2222:22 -d schnuckz/sftp \
     foo:pass:1001
 ```
 
@@ -56,7 +61,7 @@ docker run \
 
 ```
 sftp:
-    image: atmoz/sftp
+    image: schnuckz/sftp
     volumes:
         - <host-dir>/upload:/home/foo/upload
     ports:
@@ -68,16 +73,38 @@ sftp:
 
 The OpenSSH server runs by default on port 22, and in this example, we are forwarding the container's port 22 to the host's port 2222. To log in with the OpenSSH client, run: `sftp -P 2222 foo@<host-ip>`
 
+## Use Persisten Storage
+
+Only one Persisten Volume for all config & keys.
+
+```
+/config/
+├── fail2ban
+│   ├── fail2ban.log (read only)
+│   ├── jail.conf (read only, use jail.local)
+│   └── jail.local
+├── sshd
+│   ├── keys
+│   │   ├── ssh_host_ed25519_key
+│   │   └── ssh_host_rsa_key
+│   ├── scripts
+│   │   └── bindmount.sh
+│   ├── sshd_config
+│   └── users.conf
+└── userkeys
+    └── foo.pub
+```
+
 ## Store users in config
 
 ```
 docker run \
-    -v <host-dir>/users.conf:/etc/sftp/users.conf:ro \
-    -v mySftpVolume:/home \
-    -p 2222:22 -d atmoz/sftp
+    -v <host-dir>:/config \
+    -v mySftpVolume:/home/foo/share \
+    -p 2222:22 -d schnuckz/sftp
 ```
 
-<host-dir>/users.conf:
+<host-dir>/sshd/users.conf:
 
 ```
 foo:123:1001:100
@@ -92,7 +119,7 @@ Add `:e` behind password to mark it as encrypted. Use single quotes if using ter
 ```
 docker run \
     -v <host-dir>/share:/home/foo/share \
-    -p 2222:22 -d atmoz/sftp \
+    -p 2222:22 -d schnuckz/sftp \
     'foo:$1$0G2g0GSt$ewU0t6GXG15.0hWoOX8X9.:e:1001'
 ```
 
@@ -105,9 +132,8 @@ Mount public keys in the user's `.ssh/keys/` directory. All keys are automatical
 
 ```
 docker run \
-    -v <host-dir>/id_rsa.pub:/home/foo/.ssh/keys/id_rsa.pub:ro \
-    -v <host-dir>/id_other.pub:/home/foo/.ssh/keys/id_other.pub:ro \
-    -v <host-dir>/share:/home/foo/share \
+    -v <host-dir>:/config \
+    -v mySftpVolume:/home/foo/share \
     -p 2222:22 -d atmoz/sftp \
     foo::1001
 ```
@@ -118,12 +144,14 @@ This container will generate new SSH host keys at first run. To avoid that your 
 
 ```
 docker run \
-    -v <host-dir>/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key \
-    -v <host-dir>/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key \
-    -v <host-dir>/share:/home/foo/share \
-    -p 2222:22 -d atmoz/sftp \
+    -v <host-dir>:/config \
+    -v mySftpVolume:/home/foo/share \
+    -p 2222:22 -d schnuckz/sftp \
     foo::1001
 ```
+
+<host-dir>/sshd/keys/ssh_host_ed25519_key
+<host-dir>/sshd/keys/ssh_host_rsa_key
 
 Tip: you can generate your keys with these commands:
 
@@ -134,7 +162,7 @@ ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key < /dev/null
 
 ## Execute custom scripts or applications
 
-Put your programs in `/etc/sftp.d/` and it will automatically run when the container starts.
+Put your programs in `/config/sshd/scripts/` and it will automatically run when the container starts.
 See next section for an example.
 
 ## Bindmount dirs from another location
