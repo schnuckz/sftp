@@ -8,6 +8,11 @@ on:
     branches: main
   push:
     branches: main
+    paths-ignore: 
+      - "*.md"
+      - "*.txt"
+      - "*.png"
+      - ".github/*"
     tags:
       - v*
 
