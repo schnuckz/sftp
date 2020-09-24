@@ -22,8 +22,8 @@ if [[ ! -e /config/fail2ban/jail.local ]]; then
 	cp /config/fail2ban/jail.local /etc/fail2ban/jail.local
 else
         echo "$(date) [info] Existing jail.local found. Copying to container filesystem!"
-	rm /etc/fail2ban/jail.conf
-	cp "/config/fail2ban/jail.conf" "/etc/fail2ban/jail.conf"
+	rm /etc/fail2ban/jail.local
+	cp "/config/fail2ban/jail.local" "/etc/fail2ban/jail.local"
 fi
 
 if [[ ! -e /config/sshd/sshd_config ]]; then
