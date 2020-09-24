@@ -1,10 +1,12 @@
 # SFTP with Fail2ban
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/schnuckz/sftp/build?logo=github) ![GitHub stars](https://img.shields.io/github/stars/schnuckz/sftp?logo=github) ![Docker Stars](https://img.shields.io/docker/stars/schnuckz/sftp?label=stars&logo=docker) ![Docker Pulls](https://img.shields.io/docker/pulls/schnuckz/sftp?label=pulls&logo=docker)
+![buildx](https://github.com/schnuckz/sftp/workflows/buildx/badge.svg) ![GitHub stars](https://img.shields.io/github/stars/schnuckz/sftp?logo=github) ![Docker Stars](https://img.shields.io/docker/stars/schnuckz/sftp?label=stars&logo=docker) ![Docker Pulls](https://img.shields.io/docker/pulls/schnuckz/sftp?label=pulls&logo=docker)
 
 # Supported tags and respective `Dockerfile` links
 
-- [`debian`, `latest` (*Dockerfile*)](https://github.com/schnuckz/sftp/blob/master/Dockerfile) ![Docker Image Size (debian)](https://img.shields.io/docker/image-size/schnuckz/sftp/debian?label=debian&logo=debian&style=plastic)
+- [`latest` (*Dockerfile*)](https://github.com/schnuckz/sftp/blob/master/Dockerfile) ![Docker Image Size (debian)](https://img.shields.io/docker/image-size/schnuckz/sftp/latest?label=latest&logo=latest&style=plastic) automatic build when base image update, only amd64
+- [`main` (*Dockerfile*)](https://github.com/schnuckz/sftp/blob/master/Dockerfile-buildx) ![Docker Image Size (debian)](https://img.shields.io/docker/image-size/schnuckz/sftp/main?label=main&logo=latest&style=plastic) multiarch - at this moment arm **untested**, automatic build when main branch updated
+- `v*` version / multiarch - at this moment arm **untested**, automatic build when main branch/tag updated
 
 # Securely share your files
 
