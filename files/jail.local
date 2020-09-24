@@ -28,4 +28,7 @@ maxretry = 3
 #
 
 [sshd]
+bantime  = 240m
+maxretry = 3
+findtime  = 15m
 enabled = true
