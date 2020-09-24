@@ -192,7 +192,14 @@ bindmount /data/common /home/peter/common
 bindmount /data/docs /home/peter/docs --read-only
 ```
 
-**NOTE:** Using `mount` requires that your container runs with the `CAP_SYS_ADMIN` capability turned on. [See this answer for more information](https://github.com/atmoz/sftp/issues/60#issuecomment-332909232).
+**NOTE:** Using `mount` requires that your container runs with the `--cap-add=SYS_ADMIN` capability turned on. [See this answer for more information](https://github.com/atmoz/sftp/issues/60#issuecomment-332909232).
+
+# Fail2ban
+
+Using Fail2ban requires that your container runs with `--cap-add=NET_ADMIN` capability turned on.
+```
+--cap-add=NET_ADMIN is required for fail2ban to modify iptables
+```
 
 # What's the difference between Debian and Alpine?
 
