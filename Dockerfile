@@ -1,5 +1,4 @@
-ARG ARCH=
-FROM ${ARCH}debian:buster
+FROM debian:buster
 MAINTAINER schnuckz
 # Forked from atmoz/sftp for unRAID + fail2ban + raspberryPi
 
