@@ -93,10 +93,11 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          push: true
+          push: false
           file: ./Dockerfile-buildx
           platforms: ${{ steps.prepare.outputs.platforms }}
           tags: |
+            ${{ steps.prepare.outputs.docker_tags }} \
             ${{ steps.prepare.outputs.ghcr_tags }}
           build-args: |
             ${{ steps.prepare.outputs.buildx_args }}
