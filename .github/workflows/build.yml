@@ -18,7 +18,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - 
         name: checkout code
@@ -56,8 +56,8 @@ jobs:
           echo ::set-output name=ghcr_image::${GHCR_IMAGE}
           echo ::set-output name=ghcr_tags::${GHCR_TAGS}
           echo ::set-output name=version::${VERSION}
-          echo ::set-output name=build_args::--platform ${DOCKER_PLATFORMS} \
-            VERSION=${VERSION} \
+          echo ::set-output name=plattforms::${PLATFORMS}
+          echo ::set-output name=build_args::VERSION=${VERSION} \
             BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             build-arg VCS_REF=${GITHUB_SHA::8}
       -
@@ -93,6 +93,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          file: ./Dockerfile_buildx
+          platforms: ${{ steps.prepare.outputs.platforms }}
           tags: |
             ${{ steps.prepare.outputs.docker_tags }}
             ${{ steps.prepare.outputs.ghcr_tags }}
