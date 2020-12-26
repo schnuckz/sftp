@@ -4,8 +4,7 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`latest` (*Dockerfile*)](https://github.com/schnuckz/sftp/blob/master/Dockerfile) ![Docker Image Size (debian)](https://img.shields.io/docker/image-size/schnuckz/sftp/latest?label=latest&logo=latest&style=plastic) automatic build when base image update, only amd64
-- [`main` (*Dockerfile*)](https://github.com/schnuckz/sftp/blob/master/Dockerfile-buildx) ![Docker Image Size (debian)](https://img.shields.io/docker/image-size/schnuckz/sftp/main?label=main&logo=latest&style=plastic) multiarch - at this moment arm **untested**, automatic build when main branch updated
+- [`latest` (*Dockerfile*)](https://github.com/schnuckz/sftp/blob/master/Dockerfile) ![Docker Image Size (debian)](https://img.shields.io/docker/image-size/schnuckz/sftp/latest?label=latest&logo=latest&style=plastic) multiarch - at this moment arm **untested**, automatic build when main branch updated
 - `v*` version / multiarch - at this moment arm **untested**, automatic build when main branch/tag updated
 
 # Securely share your files
